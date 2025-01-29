@@ -2,13 +2,22 @@
 
 ## Overview
 
-This project provides a comprehensive solution for stock market analysis and automated trading. The key objectives of this project are to:
+## RSI & MACD Strategy
 
-1. **Fetch historical stock price data** from reliable financial sources.
-2. **Calculate major financial indicators** such as the Relative Strength Index (RSI), Moving Averages (MA), Moving Average Convergence Divergence (MACD), and more.
-3. **Run an automated trading bot** that buys and sells stocks based on the calculated financial indicators and user-defined thresholds.
+This application automates stock trading decisions using a dual-indicator strategy based on the Relative Strength Index (RSI) and the Moving Average Convergence Divergence (MACD).
 
-Designed for scalability, efficiency, and extensibility, this project empowers users to perform in-depth technical analysis and automate their trading strategies.
+Strategy Overview:
+
+The RSI acts as the primary signal indicator, identifying potential overbought or oversold conditions.
+The MACD serves as a confirmation indicator, filtering and validating trade signals to reduce false entries.
+
+## Key Features:
+
+   - Dynamic buy, sell, or hold decisions based on RSI-MACD alignment.
+   - Configurable stock symbols and trade parameters.
+   - Stop-loss and take-profit support for risk management.
+
+Designed for efficiency and scalability, this project enables users to perform highspeed analysis and automation of the RSI-MACD trading strategy againest any number of stocks.
 
 ## Steps to Run the Project
 
