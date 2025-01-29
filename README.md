@@ -10,13 +10,6 @@ This project provides a comprehensive solution for stock market analysis and aut
 
 Designed for scalability, efficiency, and extensibility, this project empowers users to perform in-depth technical analysis and automate their trading strategies.
 
-## Key Features
-
-- **Historical Stock Data Retrieval**: Fetch daily stock price data from trusted sources like Yahoo Finance.
-- **Financial Indicators Calculation**: Compute essential technical indicators such as RSI, MSA, MACD, and other key metrics to assist in data-driven decision-making.
-
-- **Automated Trading Bot**: The trading bot buys and sells stocks automatically based on the calculated indicators and thresholds set by the user. Users can customize when to buy or sell stocks by defining specific indicator levels.
-
 ## Steps to Run the Project
 
 1. Add tickers to stocks.txt that you wish to run the bot for.
