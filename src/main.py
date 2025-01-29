@@ -1,72 +1,52 @@
-#!/usr/bin/env python3
 from datetime import datetime, timedelta, timezone
-import matplotlib
-from pandas.core.common import flatten
-from tabulate import tabulate
+import traceback
 
-from stock import Stock
-
-matplotlib.rcParams.update({'font.size': 9})
-
+from stock.stock import Stock
 
 def main():
-    stocks = ['AAPL']
+    stocks = ['QQQ']
+
     # If stocks array is empty, pull stock list from stocks.txt file
     stocks = stocks if len(stocks) > 0 else [
-        line.rstrip() for line in open("stocks.txt", "r")]
+        line.rstrip().upper() for line in open("stocks.txt", "r")
+    ]
 
-    # Time frame to pull historical data for days={number of days to pull}
+    # Time frame to pull historical data
     end = datetime.now(timezone.utc).date()
-    start = end - timedelta(days=30)
-
-    # Array of moving averages you want to get
-    MAarr = [20, 200]
-    allData = []
+    start = end - timedelta(days=365)
 
     for ticker in stocks:
-
         try:
-            data = []
-
-            print("Pulling data for " + ticker)
-
+          
+            # TODO: Next steps for this are:
+            # - accept RSI BUY / SELL indicators to env variables if present
+            # - extract the ticker, RSI BUY, RSI SELL, quantities/values and trade frequency to a config yaml or csv file &
+            # - modify this file to extract from config file and configuration bot accordingly
+            # - implement additional strategies (potentially as a stock.strategies class)
+            # - deploy as aws lambda function using IAC and gh actions (copy existing implementation from directfile if needed)
+            
             stock = Stock(ticker, start, end)
-
-            # # Append data to array
-            # data.append(ticker.upper())
-
-            # data.append(stock.closes[-1])
-
-            # for MA in MAarr:
-            #     computedSMA = stock.SMA(period=MA)
-            #     # print(computedSMA)
-            #     data.append(computedSMA[-1])
-
-            # currentRsi = float("{:.2f}".format(stock.rsi[-1]))
-
-            # if currentRsi > 70:
-            #     data.append(str(currentRsi) + " 🔥")
-            # elif currentRsi < 30:
-            #     data.append(str(currentRsi) + " 🧊")
-            # else:
-            #     data.append(currentRsi)
-
-            # chartLink = "https://finance.yahoo.com/quote/" + ticker + "/chart?p=" + ticker
-
-            # data.append(chartLink)
-
-            # allData.append(data)
-
-            # # Shows chart only if current RSI is greater than or less than 70 or 30 respectively
-            # if currentRsi < 30 or currentRsi > 70:
-
-            #     stock.graph(MAarr)
+            signal = stock.generate_signal()
+            
+            newData = []
+            
+            print(f'Stock: {stock.ticker} Signal: {signal}')
+        
+            newData.append(stock.analysis.SMA(20))
+            newData.append(stock.analysis.SMA(200))
+            newData.append(stock.analysis.EMA(20))
+            newData.append(stock.analysis.MACD().macd())
+            newData.append(stock.analysis.MACD().macd_signal())
+            newData.append(stock.analysis.RSI().rsi())
+            print(newData)
+            
+            # stock.trade.submit_buy_order(10)
+            # stock.trade.submit_sell_order(10)
+            
 
         except Exception as e:
             print('Error: ', str(e))
-
-    # print(tabulate(allData, headers=flatten([
-    #     'Stock', 'Price', [str(x) + " MA" for x in MAarr], "RSI", "chart"])))
+            traceback.print_exc()
 
 
 if __name__ == "__main__":
