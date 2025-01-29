@@ -22,23 +22,26 @@ Designed for scalability, efficiency, and extensibility, this project empowers u
 
 3. **Override RSI thresholds if desired**
 
-    Default buy threshold is RSI < 30 
-    Default sell signal is RSI > 70
+   defaults:
+    - latest RSI < 30  -> signal buy
+    - latest RSI > 70 -> signal sell
 
-    override these by setting values for env variables
+    Override these by setting values for env variables:
 
-    RSI_BUY_THRESHOLD=<the_rsi_at_which_you_want_to_buy>
-    RSI_SELL_THRESHOLD=<the_rsi_at_which_you_want_to_sell>
+    - RSI_BUY_THRESHOLD=<the_rsi_at_which_you_want_to_buy>
+    - RSI_SELL_THRESHOLD=<the_rsi_at_which_you_want_to_sell>
 
     The bot uses MACD as the secondary indicator to confirm the trade strategy,
     this is calculated as:
 
-    latest MACD > MACD signal line -> confirm buy
-    
-    latest MACD < MACD signal line -> confirm sell
+    - latest MACD > MACD signal line -> confirm buy
+    - latest MACD < MACD signal line -> confirm sell
+  
+   These cannot currently be modified, but changes are coming to allow different
+   strategies other than MACD as the confirmation signal.
 
 
-4. **Install Packages and run app**
+5. **Install Packages and run app**
 
    Install dependencies and run the app with the following commands:
 
