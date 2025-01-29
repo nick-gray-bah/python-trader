@@ -1,6 +1,4 @@
-# Python Trading Bot
-
-## Overview
+# Python Trader
 
 ## RSI & MACD Strategy
 
