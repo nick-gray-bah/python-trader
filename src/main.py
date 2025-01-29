@@ -4,14 +4,8 @@ import traceback
 from stock.stock import Stock
 
 def main():
-    stocks = ['QQQ']
+    stocks = [ line.rstrip().upper() for line in open("stocks.txt", "r")]
 
-    # If stocks array is empty, pull stock list from stocks.txt file
-    stocks = stocks if len(stocks) > 0 else [
-        line.rstrip().upper() for line in open("stocks.txt", "r")
-    ]
-
-    # Time frame to pull historical data
     end = datetime.now(timezone.utc).date()
     start = end - timedelta(days=365)
 
