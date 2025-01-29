@@ -16,9 +16,9 @@ Designed for scalability, efficiency, and extensibility, this project empowers u
 
 2. **Set env variables for your alpaca trading account**
 
-   ALPACA_API_KEY=<your_alpaca_api_key>
-   ALPACA_SECRET_KEY=<your_alpaca_secret_key>
-   ALPACA_BASE_URL=<your_alpaca_base_url>
+   - ALPACA_API_KEY=<your_alpaca_api_key>
+   - ALPACA_SECRET_KEY=<your_alpaca_secret_key>
+   - ALPACA_BASE_URL=<your_alpaca_base_url>
 
 3. **Override RSI thresholds if desired**
 
