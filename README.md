@@ -2,20 +2,20 @@
 
 ## RSI & MACD Strategy
 
-This application automates stock trading decisions using a dual-indicator strategy based on the Relative Strength Index (RSI) and the Moving Average Convergence Divergence (MACD).
+This project automates stock trading decisions using a dual-indicator strategy based on the Relative Strength Index (RSI) and the Moving Average Convergence Divergence (MACD).
 
 Strategy Overview:
 
 - The RSI acts as the primary signal indicator, identifying potential overbought or oversold conditions.
 - The MACD serves as a confirmation indicator, filtering and validating trade signals to reduce false entries.
 
+Designed for efficiency and scalability, this project enables users to automate their RSI-MACD trading strategy for any combination of stocks, trading horizons and buy/sell thresholds.
+
 ## Key Features:
 
    - Dynamic buy, sell, or hold decisions based on RSI-MACD alignment.
    - Configurable stock symbols and trade parameters.
    - Stop-loss and take-profit support for risk management.
-
-Designed for efficiency and scalability, this project enables users to perform highspeed analysis and automation of the RSI-MACD trading strategy againest any number of stocks.
 
 ## Steps to Run the Project
 
