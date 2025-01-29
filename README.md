@@ -6,8 +6,8 @@ This application automates stock trading decisions using a dual-indicator strate
 
 Strategy Overview:
 
-The RSI acts as the primary signal indicator, identifying potential overbought or oversold conditions.
-The MACD serves as a confirmation indicator, filtering and validating trade signals to reduce false entries.
+- The RSI acts as the primary signal indicator, identifying potential overbought or oversold conditions.
+- The MACD serves as a confirmation indicator, filtering and validating trade signals to reduce false entries.
 
 ## Key Features:
 
