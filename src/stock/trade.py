@@ -6,11 +6,10 @@ from alpaca_client import alpaca_client
 
 
 class StockTrade:
-    ticker = None
-    trade_history = []
 
     def __init__(self, ticker):
         self.ticker = ticker
+        self.trade_history = []
 
     def get_latest_price(self):
         """ gets the most recent quoted share price """
@@ -88,7 +87,7 @@ class StockTrade:
             print({"status": "Error", "error": str(e)})
             traceback.print_exc()
 
-    def submit_sell_order(self, quantity=None, value=None):
+    async def submit_sell_order(self, quantity=None, value=None):
         """ Executes a sell trade
         Parameters:
             quantity (int): The quantity of the asset to sell. (If included value will be ignored)
@@ -174,7 +173,7 @@ class StockTrade:
         except Exception as e:
             print({"status": "Error", "error": str(e)})
 
-    @retry(wait=wait_fixed(30), stop=stop_after_attempt(5), reraise=True)
+    @retry(wait=wait_fixed(15), stop=stop_after_attempt(5), reraise=True)
     def check_order_status(self, order_id):
         """Check the order status and retry every 3 minutes if needed (10 retries max)"""
 
