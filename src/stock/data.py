@@ -1,41 +1,51 @@
 from datetime import datetime, timedelta
 import threading
 import yfinance
-import matplotlib.dates as mdates
 
 
 class StockData:
-    _lock = threading.Lock()  # Class-level lock for yfinance downloads
+    _lock = threading.Lock()  # Class-level lock for yfinance downloads to support multithreading
     _cache = {}
 
-    def __init__(self, ticker, start=None, end=None):
+    def __init__(self, ticker):
         self.ticker = str.upper(ticker)
-        self.end = end if end else datetime.now()
-        self.start = start if start else (self.end - timedelta(days=365))
-        self._fetch_data()
 
-    def _fetch_data(self):
-        cache_key = (self.ticker, self.start, self.end)
+    def fetch_bars(self, interval='1D', timeframe=120):
+        end = datetime.now()
+        start = end - timedelta(days=timeframe)
+        cache_key = (self.ticker, start, end, interval, timeframe)
+
+        if cache_key in StockData._cache:
+            return StockData._cache[cache_key]
 
         with StockData._lock:
-            if cache_key in StockData._cache:
-                bars = StockData._cache[cache_key]
-            else:
-                print("Pulling data for " + self.ticker)
+            print("Pulling data for " + self.ticker)
+            try:
                 bars = yfinance.download(
                     self.ticker,
-                    start=self.start,
-                    end=self.end,
+                    start=start,
+                    end=end,
+                    interval=interval,
                     multi_level_index=False
                 )
+
+                if bars.empty:
+                    self.remove_ticker()
+                    raise ValueError(f"no data returned for {self.ticker}")
+
                 StockData._cache[cache_key] = bars
+                return bars
 
-        if bars.empty:
-            raise ValueError(f"No data returned for {self.ticker}")
+            except Exception as e:
+                print(f'error fetching bars: {e}')
 
-        self.dates = [mdates.date2num(d) for d in bars.index]
-        self.closes = bars['Close']
-        self.highs = bars['High']
-        self.lows = bars['Low']
-        self.opens = bars['Open']
-        self.volumes = bars['Volume']
+    def remove_ticker(self):
+      print(f'removing ticker {self.ticker} from all_stock.txt')
+      
+      with open('all_stocks.txt', "r") as file:
+        symbols = file.read().splitlines()
+        updated_symbols = [symbol for symbol in symbols if symbol != self.ticker]
+        
+      with open('all_stocks.txt', "w") as file:
+        for symbol in updated_symbols:
+            file.write(symbol + "\n")

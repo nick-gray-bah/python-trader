@@ -1,8 +1,9 @@
 import math
 import traceback
 from tenacity import RetryError, retry, stop_after_attempt, wait_fixed
+from alpaca_trade_api import REST
 
-from alpaca_client import alpaca_client
+from config import ALPACA_API_KEY, ALPACA_BASE_URL, ALPACA_SECRET_KEY
 
 
 class StockTrade:
@@ -10,11 +11,12 @@ class StockTrade:
     def __init__(self, ticker):
         self.ticker = ticker
         self.trade_history = []
+        self.alpaca = REST(ALPACA_API_KEY, ALPACA_SECRET_KEY, ALPACA_BASE_URL)
 
     def get_latest_price(self):
         """ gets the most recent quoted share price """
         try:
-            quote = alpaca_client.get_latest_quote(self.ticker)
+            quote = self.alpaca.get_latest_quote(self.ticker)
 
             if quote.ap is None:
                 raise ValueError(
@@ -53,7 +55,7 @@ class StockTrade:
         try:
             quantity = self.calculate_trade_quantity(quantity, value)
 
-            order = alpaca_client.submit_order(
+            order = self.alpaca.submit_order(
                 symbol=self.ticker,
                 side='buy',
                 qty=quantity,
@@ -97,7 +99,7 @@ class StockTrade:
         try:
             quantity = self.calculate_trade_quantity(quantity, value)
 
-            order = alpaca_client.submit_order(
+            order = self.alpaca.submit_order(
                 symbol=self.ticker,
                 side='sell',
                 qty=quantity,
@@ -123,7 +125,7 @@ class StockTrade:
         """Submit a stop loss order."""
 
         try:
-            order = alpaca_client.submit_order(
+            order = self.alpaca.submit_order(
                 symbol=self.ticker,
                 qty=quantity,
                 side='sell',
@@ -150,7 +152,7 @@ class StockTrade:
         """Submit a take profit order"""
 
         try:
-            order = alpaca_client.submit_order(
+            order = self.alpaca.submit_order(
                 symbol=self.ticker,
                 qty=quantity,
                 side='sell',
@@ -179,7 +181,7 @@ class StockTrade:
 
         print(f"Checking status of order: {order_id}")
 
-        order_status = alpaca_client.get_order(order_id)
+        order_status = self.alpaca.get_order(order_id)
 
         if order_status.status == 'filled':
             return float(order_status.filled_avg_price)

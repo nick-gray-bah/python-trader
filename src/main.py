@@ -1,29 +1,55 @@
-from concurrent.futures import ThreadPoolExecutor
-import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import traceback
 
 from stock.stock import Stock
 
+from scripts.bullish_conditions import fetch_all_stock_symbols
+
 # TODO: Next steps for this are:
-# - accept RSI BUY / SELL indicators to env variables if present
+# - deploy as aws lambda function using IAC and gh actions
 # - implement async io instead of thread pooling
-# - extract the ticker, RSI BUY, RSI SELL, quantities/values and trade frequency to a config yaml or csv file &
-# - modify this file to extract from config file and configuration bot accordingly
-# - implement additional strategies (potentially as a stock.strategies class)
-# - deploy as aws lambda function using IAC and gh actions (copy existing implementation from directfile if needed)
+# - modify this file to extract buy/sell signal indicators config file and configuration bot accordingly
+
 
 def process_ticker(ticker):
-    stock = Stock(ticker)
-    while True:
-      stock.analyze_and_trade()
-      time.sleep(60 * 60)
+    try:
+        stock = Stock(ticker)
+        result = stock.macd_and_rsi()
+        # stock.macd_crossover()
+        # stock.ema_crossover_and_rsi()
+        return result
+
+    except Exception as e:
+        print(f'error: {e}')
+        return {
+            'ticker': stock.ticker,
+            'signal': 'HOLD'
+        }
+
 
 def main():
-    # Read tickers from the file
-    stocks = [line.rstrip().upper() for line in open("stocks.txt", "r")]
-    
-    # Use ThreadPoolExecutor to process tickers concurrently
+    stocks = [line.rstrip().upper()
+              for line in open("all_stocks.txt", "r")][100:200]
+    buys = []
+    sells = []
+
+    # process multiple tickers concurrently
     with ThreadPoolExecutor() as executor:
-        executor.map(process_ticker, stocks)
+        future_to_stock = {executor.submit(
+            process_ticker, symbol): symbol for symbol in stocks}
+
+        for future in as_completed(future_to_stock):
+            result = future.result()
+            if result['signal'] == 'BUY':
+                buys.append(result['ticker'])
+            elif result['signal'] == 'SELL':
+                sells.append(result['ticker'])
+
+    print('buys')
+    print(buys)
+    print('sells')
+    print(sells)
+
 
 if __name__ == "__main__":
     main()
