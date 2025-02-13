@@ -1,26 +1,30 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import traceback
-
+import json
+import pandas as pd
 from stock.stock import Stock
 
-from scripts.bullish_conditions import fetch_all_stock_symbols
-
 # TODO: Next steps for this are:
+# - extract the desired strategy and the buy/sell signal indicators to a config file and import for dynamic configuration
 # - deploy as aws lambda function using IAC and gh actions
 # - implement async io instead of thread pooling
-# - modify this file to extract buy/sell signal indicators config file and configuration bot accordingly
 
 
 def process_ticker(ticker):
     try:
         stock = Stock(ticker)
-        result = stock.macd_and_rsi()
-        # stock.macd_crossover()
-        # stock.ema_crossover_and_rsi()
+        # result = stock.macd_crossover()
+        result = stock.ema_crossover_and_rsi()
+        # result = stock.macd_and_rsi()
+
+        if result['signal'] == 'BUY':
+            stock.trade.submit_buy_order(10)
+        elif result['signal'] == 'SELL':
+            stock.trade.close_position()
+
         return result
 
     except Exception as e:
-        print(f'error: {e}')
+        print(e)
         return {
             'ticker': stock.ticker,
             'signal': 'HOLD'
@@ -28,12 +32,11 @@ def process_ticker(ticker):
 
 
 def main():
-    stocks = [line.rstrip().upper()
-              for line in open("all_stocks.txt", "r")][100:200]
+    stocks = pd.read_csv('data/russell_1000.csv', header=0)['Ticker'].head(250)
+    # stocks = ['LBTYK', 'BSX', 'TWLO', 'ITCI', 'WEN']
     buys = []
     sells = []
 
-    # process multiple tickers concurrently
     with ThreadPoolExecutor() as executor:
         future_to_stock = {executor.submit(
             process_ticker, symbol): symbol for symbol in stocks}
@@ -41,14 +44,14 @@ def main():
         for future in as_completed(future_to_stock):
             result = future.result()
             if result['signal'] == 'BUY':
-                buys.append(result['ticker'])
+                buys.append(result)
             elif result['signal'] == 'SELL':
-                sells.append(result['ticker'])
+                sells.append(result)
 
-    print('buys')
-    print(buys)
-    print('sells')
-    print(sells)
+    print('buys: ')
+    print(json.dumps(buys, indent=4))
+    print('sells: ')
+    print(json.dumps(sells, indent=4))
 
 
 if __name__ == "__main__":

@@ -11,16 +11,21 @@ class Stock:
         self.data = StockData(self.ticker)
         self.trade = StockTrade(self.ticker)
 
-    def ema_crossover_and_rsi(self, short_ema=10, long_ema=34, rsi_window=14, rsi_threshold=50):
+    def ema_crossover_and_rsi(self, short_ema=10, long_ema=34, rsi_window=14, rsi_lower=50, rsi_upper=75):
         """
         'BUY' when short ema crosses over long ema at the last close and rsi > rsi_threshold
         'SELL'  when long ema crosses over short ema at the last close
         'HOLD' default
         """
         prices = self.data.fetch_bars()
+        
+        if prices is None or len(prices) < long_ema:
+          raise ValueError(f"insufficient data for {self.ticker}")
 
-        prices['ema_10'] = EMAIndicator(prices['Close'], short_ema).ema_indicator()
-        prices['ema_34'] = EMAIndicator(prices['Close'], long_ema).ema_indicator()
+        prices['ema_10'] = EMAIndicator(
+            prices['Close'], short_ema).ema_indicator()
+        prices['ema_34'] = EMAIndicator(
+            prices['Close'], long_ema).ema_indicator()
         prices['RSI'] = RSIIndicator(prices['Close'], rsi_window).rsi()
 
         latest_ema_10 = prices['ema_10'].iloc[-1]
@@ -29,16 +34,15 @@ class Stock:
         prev_ema_34 = prices['ema_10'].iloc[-2]
         latest_rsi = prices['RSI'].iloc[-1]
         
-        
         signal = 'HOLD'
-        if latest_ema_10 > latest_ema_34 and prev_ema_10 < prev_ema_34 and latest_rsi > rsi_threshold:
+        if latest_ema_10 > latest_ema_34 and prev_ema_10 < prev_ema_34 and rsi_lower < latest_rsi < rsi_upper:
             signal = "BUY"
         elif latest_ema_34 > latest_ema_10 and prev_ema_34 < prev_ema_10:
             signal = "SELL"
 
         results = {
             'ticker': self.ticker,
-            'strategy': 'ema 10 / ema 34 crossover and RSI',
+            'strategy': 'ema 10 / ema 34 crossover and RSI range',
             'signal': signal,
             'latest_ema_10': str(round(latest_ema_10, 2)),
             'prev_ema_10': str(round(prev_ema_10, 2)),
@@ -47,7 +51,6 @@ class Stock:
             'RSI': str(round(prices['RSI'].iloc[-1], 2))
         }
 
-        print(results)
         return results
 
     def macd_crossover(self, window_slow=26, window_fast=12, window_sign=9):
@@ -57,6 +60,9 @@ class Stock:
         'HOLD' default
         """
         prices = self.data.fetch_bars()
+
+        if prices is None or len(prices) < window_slow + window_sign:
+            raise ValueError(f"insufficient data for {self.ticker}")
 
         macd = MACD(prices['Close'], window_slow,
                     window_fast, window_sign)
@@ -81,7 +87,6 @@ class Stock:
             'latest_macd_signal': str(round(latest_macd_signal, 2))
         }
         
-        print(result)
         return result
 
     def macd_and_rsi(self, RSI_Buy=30, RSI_Sell=70, window_slow=26, window_fast=12, window_sign=9):
@@ -94,9 +99,9 @@ class Stock:
             RSI_Sell (int, optional): The upper limit RSI (Sell if RSI > RSI_Sell). Defaults to 70.
         """
         prices = self.data.fetch_bars()
-        
+
         if prices is None or prices.empty:
-          raise ValueError('closing prices could not be retrieved')
+            raise ValueError(f"insufficient data for {self.ticker}")
 
         latest_rsi = RSIIndicator(prices['Close'], 14).rsi().iloc[-1]
         macd = MACD(prices['Close'], window_slow,
@@ -104,7 +109,7 @@ class Stock:
 
         latest_macd = macd.macd().iloc[-1]
         latest_macd_signal = macd.macd_signal().iloc[-1]
-        
+
         signal = 'HOLD'
         if latest_rsi < RSI_Buy and latest_macd > latest_macd_signal:
             signal = "BUY"
@@ -120,5 +125,4 @@ class Stock:
             'latest_macd_signal': str(round(latest_macd_signal, 2)),
         }
 
-        print(result)
         return result

@@ -1,21 +1,36 @@
 # Python Trader
 
-## RSI & MACD Strategy
+## OVERVIEW
 
-This project automates stock trading decisions using a dual-indicator strategy based on the Relative Strength Index (RSI) and the Moving Average Convergence Divergence (MACD).
+This project automates stock trading decisions for a list of provided tickers and a selected stock trading strategy. Available strategies are listed below.
+
+Designed for efficiency and scalability, this project enables users to automate their selected trading strategy for any combination of stocks, time horizons and buy/sell thresholds.
+
+## Strategies
+
+### RSI & MACD Strategy
+
+A dual-indicator strategy based on the Relative Strength Index (RSI) and the Moving Average Convergence Divergence (MACD).
 
 Strategy Overview:
 
 - The RSI acts as the primary signal indicator, identifying potential overbought or oversold conditions.
 - The MACD serves as a confirmation indicator, filtering and validating trade signals to reduce false entries.
 
-Designed for efficiency and scalability, this project enables users to automate their RSI-MACD trading strategy for any combination of stocks, trading horizons and buy/sell thresholds.
+### EMA Crossover and RSI Strategy
 
-## Key Features:
+A dual-indicator strategy based on a short term Exponential Moving Average (EMA) crossing above the long term EMA, and a Bullish RSI signal.
 
-   - Dynamic buy, sell, or hold decisions based on RSI-MACD alignment.
-   - Configurable stock symbols and trade parameters.
-   - Stop-loss and take-profit support for risk management.
+Strategy Overview:
+
+- The EMA crossover acts as the primary signal indicator, indicating a bullish price movement.
+- The RSI acts as the confirmation indicator, indicating that the stock is bullish but not overbought or oversold.
+
+## Key Features
+
+- Dynamic buy, sell, or hold decisions based on strategy alignment.
+- Configurable stock symbols and trade parameters.
+- Stop-loss and take-profit support for risk management.
 
 ## Steps to Run the Project
 
@@ -27,28 +42,11 @@ Designed for efficiency and scalability, this project enables users to automate 
    - ALPACA_SECRET_KEY=<your_alpaca_secret_key>
    - ALPACA_BASE_URL=<your_alpaca_base_url>
 
-3. **Override RSI thresholds if desired**
+3. **Select from an available trading strategy and define BUY/SELL parameters**
 
-   defaults:
-    - latest RSI < 30  -> signal buy
-    - latest RSI > 70 -> signal sell
+    TODO: add the params for each available strategy
 
-    Override these by setting values for env variables:
-
-    - RSI_BUY_THRESHOLD=<the_rsi_at_which_you_want_to_buy>
-    - RSI_SELL_THRESHOLD=<the_rsi_at_which_you_want_to_sell>
-
-    The bot uses MACD as the secondary indicator to confirm the trade strategy,
-    this is calculated as:
-
-    - latest MACD > MACD signal line -> confirm buy
-    - latest MACD < MACD signal line -> confirm sell
-  
-   These cannot currently be modified, but changes are coming to allow different
-   strategies other than MACD as the confirmation signal.
-
-
-5. **Install Packages and run app**
+4. **Install Packages and run app**
 
    Install dependencies and run the app with the following commands:
 

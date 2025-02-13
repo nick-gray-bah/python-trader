@@ -4,7 +4,8 @@ import yfinance
 
 
 class StockData:
-    _lock = threading.Lock()  # Class-level lock for yfinance downloads to support multithreading
+    # Class-level lock for yfinance downloads to support multithreading
+    _lock = threading.Lock()
     _cache = {}
 
     def __init__(self, ticker):
@@ -30,8 +31,7 @@ class StockData:
                 )
 
                 if bars.empty:
-                    self.remove_ticker()
-                    raise ValueError(f"no data returned for {self.ticker}")
+                    raise ValueError(f"No data returned for {self.ticker}")
 
                 StockData._cache[cache_key] = bars
                 return bars
@@ -40,12 +40,14 @@ class StockData:
                 print(f'error fetching bars: {e}')
 
     def remove_ticker(self):
-      print(f'removing ticker {self.ticker} from all_stock.txt')
-      
-      with open('all_stocks.txt', "r") as file:
-        symbols = file.read().splitlines()
-        updated_symbols = [symbol for symbol in symbols if symbol != self.ticker]
-        
-      with open('all_stocks.txt', "w") as file:
-        for symbol in updated_symbols:
-            file.write(symbol + "\n")
+        """ util to remove stocks with no/insufficient historical data from the all_stocks file"""
+        print(f'removing ticker {self.ticker} from all_stock.txt')
+
+        with open('data/all_stocks.txt', "r") as file:
+            symbols = file.read().splitlines()
+            updated_symbols = [
+                symbol for symbol in symbols if symbol != self.ticker]
+
+        with open('data/all_stocks.txt', "w") as file:
+            for symbol in updated_symbols:
+                file.write(symbol + "\n")
