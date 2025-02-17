@@ -1,6 +1,5 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
-import pandas as pd
 from stock.stock import Stock
 
 # TODO: Next steps for this are:
@@ -12,9 +11,9 @@ from stock.stock import Stock
 def process_ticker(ticker):
     try:
         stock = Stock(ticker)
-        # result = stock.macd_crossover()
-        result = stock.ema_crossover_and_rsi()
-        # result = stock.macd_and_rsi()
+        result = stock.macd_crossover()
+        # result = stock.ema_crossover_and_rsi(rsi_lower=30, rsi_upper=70)
+        # result = stock.macd_and_rsi(RSI_Buy=43, RSI_Sell=80)
 
         if result['signal'] == 'BUY':
             stock.trade.submit_buy_order(10)
@@ -32,14 +31,14 @@ def process_ticker(ticker):
 
 
 def main():
-    stocks = pd.read_csv('data/russell_1000.csv', header=0)['Ticker'].head(250)
-    # stocks = ['LBTYK', 'BSX', 'TWLO', 'ITCI', 'WEN']
+    stocks = [line.rstrip().upper()
+              for line in open("data/all_stocks.txt", "r")]
     buys = []
     sells = []
 
-    with ThreadPoolExecutor() as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         future_to_stock = {executor.submit(
-            process_ticker, symbol): symbol for symbol in stocks}
+            process_ticker, ticker): ticker for ticker in stocks}
 
         for future in as_completed(future_to_stock):
             result = future.result()

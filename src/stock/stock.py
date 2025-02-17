@@ -35,9 +35,9 @@ class Stock:
         latest_rsi = prices['RSI'].iloc[-1]
         
         signal = 'HOLD'
-        if latest_ema_10 > latest_ema_34 and prev_ema_10 < prev_ema_34 and rsi_lower < latest_rsi < rsi_upper:
+        if latest_ema_10 >= latest_ema_34 and prev_ema_10 < prev_ema_34 and rsi_lower < latest_rsi < rsi_upper:
             signal = "BUY"
-        elif latest_ema_34 > latest_ema_10 and prev_ema_34 < prev_ema_10:
+        elif latest_ema_34 >= latest_ema_10 and prev_ema_34 < prev_ema_10:
             signal = "SELL"
 
         results = {
@@ -89,14 +89,11 @@ class Stock:
         
         return result
 
-    def macd_and_rsi(self, RSI_Buy=30, RSI_Sell=70, window_slow=26, window_fast=12, window_sign=9):
+    def macd_and_rsi(self, rsi_buy=30, rsi_sell=70, window_slow=26, window_fast=12, window_sign=9):
         """
         'BUY' when RSI is oversold(latest RSI < RSI_Buy) and MACD is above the signal line
         'SELL' when RSI is overbought(latest RSI > RSI_Sell) and MACD is below the signal line
         'HOLD' default
-        Args:
-            RSI_Buy (int, optional): The lower limit RSI (Buy if RSI < RSI_Buy). Defaults to 30.
-            RSI_Sell (int, optional): The upper limit RSI (Sell if RSI > RSI_Sell). Defaults to 70.
         """
         prices = self.data.fetch_bars()
 
@@ -111,9 +108,9 @@ class Stock:
         latest_macd_signal = macd.macd_signal().iloc[-1]
 
         signal = 'HOLD'
-        if latest_rsi < RSI_Buy and latest_macd > latest_macd_signal:
+        if latest_rsi < rsi_buy and latest_macd > latest_macd_signal:
             signal = "BUY"
-        elif latest_rsi > RSI_Sell and latest_macd < latest_macd_signal:
+        elif latest_rsi > rsi_sell and latest_macd < latest_macd_signal:
             signal = "SELL"
 
         result = {
