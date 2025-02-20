@@ -37,6 +37,7 @@ class StockData:
                 return bars
 
             except Exception as e:
+                self.remove_ticker()
                 print(f'error fetching bars: {e}')
 
     def remove_ticker(self):

@@ -33,6 +33,7 @@ def process_ticker(ticker):
 def main():
     stocks = [line.rstrip().upper()
               for line in open("data/all_stocks.txt", "r")]
+  
     buys = []
     sells = []
 

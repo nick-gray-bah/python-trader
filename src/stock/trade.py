@@ -65,6 +65,7 @@ class StockTrade:
             position = self.get_current_position()
 
             if position is not None:
+                print(f'{self.ticker} already owned, no order submitted')
                 return
 
             quantity = self.calculate_trade_quantity(quantity, value)
